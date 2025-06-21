@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motion Profile Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        .tab-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+        .tab-btn { border-bottom: 2px solid transparent; }
+        .input-group { margin-bottom: 1rem; }
+        .input-group label.group-title { display: block; font-size: 0.875rem; font-weight: 500; color: #d1d5db; margin-bottom: 0.25rem; }
+        .input-group input[type="number"] { width: 100%; background-color: #374151; border: 1px solid #4b5563; border-radius: 0.5rem; padding: 0.5rem; color: white; transition: border-color 0.2s, box-shadow 0.2s; }
+        .input-group input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
+        .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; }
+        .output-grid strong { color: #9ca3af; }
+        .output-grid span { font-family: 'monospace'; font-size: 1.125rem; }
+        
+        /* Radio Pill Styles */
+        .radio-pill-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .radio-pill-group label {
+            position: relative;
+            flex: 1;
+            cursor: pointer;
+        }
+        .radio-pill-group input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .radio-pill-group span {
+            display: block;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            text-align: center;
+            color: #d1d5db;
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .radio-pill-group input[type="radio"]:checked + span {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white">Motion Profile Calculator V.001 </h1>
+            <p class="text-lg text-gray-400 mt-2">Select a calculation mode and profile type to analyze and visualize motion.</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="mb-6 border-b border-gray-700">
+            <nav class="-mb-px flex space-x-2 overflow-x-auto pb-1" aria-label="Tabs">
+                 <button class="tab-btn active whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab1">x, T, Aₚₖ → V</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab2">x, Vₘₐₓ, Aₚₖ → T</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab3">x, Vₘₐₓ, T → A</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab4">Vₘₐₓ, Aₚₖ, T → x</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab5">Vₘₐₓ, xₐ, x → A, T</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab6">Vₘₐₓ, xₐ, T → A, x</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab7">Scan: V, xₛ, A → T, x</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab8">Scan: V, xₛ, x → A, T</button>
+                <button class="tab-btn text-gray-400 whitespace-nowrap text-sm md:text-base font-medium py-3 px-4 rounded-t-lg transition-colors duration-200 hover:bg-gray-700" data-tab="tab9">Scan: V, xₛ, T → A, x</button>
+            </nav>
+        </div>
+
+        <!-- Tab Content Wrapper -->
+        <main>
+            <!-- All tabs will be dynamically generated and placed here by JS -->
+        </main>
+        
+        <div id="error-message" class="hidden mt-6 p-4 bg-red-800 border border-red-600 text-white rounded-lg"></div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const TABS_CONFIG = [
+            { id: 1, title: 'x, T, Aₚₖ → V', inputs: [ { id: 'x', label: 'Distance (x)', val: 100 }, { id: 'T', label: 'Time (T)', val: 5 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 8 } ], outputs: ['Vmax', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 2, title: 'x, Vₘₐₓ, Aₚₖ → T', inputs: [ { id: 'x', label: 'Distance (x)', val: 100 }, { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 10 } ], outputs: ['T', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 3, title: 'x, Vₘₐₓ, T → A', inputs: [ { id: 'x', label: 'Distance (x)', val: 100 }, { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'T', label: 'Time (T)', val: 5 } ], outputs: ['Apk', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 4, title: 'Vₘₐₓ, Aₚₖ, T → x', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 10 }, { id: 'T', label: 'Time (T)', val: 5 } ], outputs: ['x', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 5, title: 'Vₘₐₓ, xₐ, x → A, T', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'xa', label: 'Accel Distance (xₐ)', val: 45 }, { id: 'x', label: 'Total Distance (x)', val: 120 } ], outputs: ['Apk', 'T', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 6, title: 'Vₘₐₓ, xₐ, T → A, x', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'xa', label: 'Accel Distance (xₐ)', val: 45 }, { id: 'T', label: 'Time (T)', val: 5 } ], outputs: ['Apk', 'x', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 7, title: 'Scan: V, xₛ, A → T, x', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ)', val: 50 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 10 } ], outputs: ['T', 'x', 't_a', 't_c', 't_d'] },
+            { id: 8, title: 'Scan: V, xₛ, x → A, T', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ)', val: 50 }, { id: 'x', label: 'Total Distance (x)', val: 130 } ], outputs: ['Apk', 'T', 't_a', 't_c', 't_d'] },
+            { id: 9, title: 'Scan: V, xₛ, T → A, x', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ)', val: 50 }, { id: 'T', label: 'Time (T)', val: 6.5 } ], outputs: ['Apk', 'x', 't_a', 't_c', 't_d'] },
+        ];
+        
+        const OUTPUT_LABELS = { Vmax: 'Max Velocity (Vₘₐₓ)', Apk: 'Peak Accel (Aₚₖ)', T: 'Total Time (T)', x: 'Total Distance (x)', t_a: 'Accel Time (tₐ)', t_c: 'Traverse Time (tₑ)', t_d: 'Decel Time (tₔ)', profileType: 'Profile Type' };
+
+        // --- UI GENERATION ---
+        function generateUI() {
+            const main = document.querySelector('main');
+            main.innerHTML = ''; 
+            TABS_CONFIG.forEach((tab, index) => {
+                const isHidden = index === 0 ? '' : 'hidden';
+                const profileRadioHTML = `
+                    <div class="input-group">
+                        <label class="group-title">Profile Type</label>
+                        <div class="radio-pill-group">
+                            <label>
+                                <input type="radio" name="profileType${tab.id}" value="constant" checked>
+                                <span>Constant</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="profileType${tab.id}" value="sinusoidal">
+                                <span>Sinusoidal</span>
+                            </label>
+                             <label>
+                                <input type="radio" name="profileType${tab.id}" value="linear">
+                                <span>S-Curve</span>
+                            </label>
+                        </div>
+                    </div>`;
+                const inputsHTML = tab.inputs.map(input => `
+                    <div class="input-group">
+                        <label class="group-title" for="${input.id}${tab.id}">${input.label}</label>
+                        <input type="number" id="${input.id}${tab.id}" value="${input.val}">
+                    </div>`).join('');
+                const outputsHTML = tab.outputs.map(output => `<p><strong>${OUTPUT_LABELS[output]}:</strong> <span id="${output}${tab.id}" class="${output === 'profileType' ? 'text-yellow-400' : 'text-blue-400'}">0</span></p>`).join('');
+                const tabHTML = `
+                <div id="tab${tab.id}" class="tab-content ${isHidden}">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-1 bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h2 class="text-2xl font-semibold mb-4 text-white">Inputs</h2>
+                            <form id="calc-form-${tab.id}">${profileRadioHTML}${inputsHTML}</form>
+                            <hr class="my-6 border-gray-600">
+                            <h2 class="text-2xl font-semibold mb-4 text-white">Outputs</h2>
+                            <div class="space-y-2 text-base">${outputsHTML}</div>
+                        </div>
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-gray-800 p-4 rounded-xl shadow-lg h-64 md:h-72"><canvas id="posChart${tab.id}"></canvas></div>
+                            <div class="bg-gray-800 p-4 rounded-xl shadow-lg h-64 md:h-72"><canvas id="velChart${tab.id}"></canvas></div>
+                            <div class="bg-gray-800 p-4 rounded-xl shadow-lg h-64 md:h-72"><canvas id="accelChart${tab.id}"></canvas></div>
+                        </div>
+                    </div>
+                </div>`;
+                main.insertAdjacentHTML('beforeend', tabHTML);
+            });
+        }
+        
+        // --- CHART & ERROR HANDLING ---
+        const chartInstances = {};
+        Chart.defaults.color = '#9ca3af'; Chart.defaults.borderColor = '#4b5563';
+        function createOrUpdateChart(canvasId, labels, data, yAxisLabel, pointColor) {
+            const ctx = document.getElementById(canvasId)?.getContext('2d');
+            if (!ctx) return;
+            if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+            chartInstances[canvasId] = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: yAxisLabel, data: data, borderColor: pointColor, backgroundColor: pointColor + '33', borderWidth: 2, pointRadius: 0, tension: 0.1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { title: { display: true, text: 'Time (s)', color: '#d1d5db' }, grid: { color: '#374151' } }, y: { title: { display: true, text: yAxisLabel, color: '#d1d5db' }, grid: { color: '#374151' }, beginAtZero: false } }, plugins: { legend: { display: false } } } });
+        }
+        const errorDiv = document.getElementById('error-message');
+        function displayError(message) { errorDiv.textContent = `Error: ${message}`; errorDiv.classList.remove('hidden'); }
+        function clearError() { if (!errorDiv.classList.contains('hidden')) errorDiv.classList.add('hidden'); }
+        function clearCharts(tabNum) {['posChart', 'velChart', 'accelChart'].forEach(name => {const canvasId = `${name}${tabNum}`; if (chartInstances[canvasId]) { chartInstances[canvasId].destroy(); delete chartInstances[canvasId]; const ctx = document.getElementById(canvasId)?.getContext('2d'); ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); } }); }
+        function getVal(id) { return parseFloat(document.getElementById(id).value); }
+        function updateOutput(id, value, precision = 3) { const el = document.getElementById(id); if(el) el.textContent = (typeof value === 'string') ? value : (isNaN(value) ? 'N/A' : value.toFixed(precision)); }
+
+        // --- CALCULATION LOGIC ---
+        function getProfileFactors(profileType) {
+            switch (profileType) {
+                case 'sinusoidal': return { kv: 2 / Math.PI, kx: 1 / Math.PI };
+                case 'linear':     return { kv: 0.5, kx: 1/3 };
+                case 'constant':
+                default:           return { kv: 1, kx: 0.5 };
+            }
+        }
+        function getInputs(tabId) {
+            const config = TABS_CONFIG.find(t => t.id === tabId);
+            const inputs = { profileType: document.querySelector(`input[name="profileType${tabId}"]:checked`).value };
+            config.inputs.forEach(input => { inputs[input.id] = getVal(input.id + tabId); });
+            return inputs;
+        }
+
+        const CALCULATORS = {
+            1: () => {
+                const { x, T, Apk, profileType } = getInputs(1);
+                const { kv, kx } = getProfileFactors(profileType);
+                const Vmax_triangle = Math.sqrt(x * Apk * kv * kv / (2 * kx));
+                let T_triangle = Vmax_triangle > 0 ? (2 * Vmax_triangle) / (kv * Apk) : 0;
+                let Vmax, t_a, t_c, profileTypeStr;
+                if (T > T_triangle) {
+                    profileTypeStr = "Trapezoid";
+                    const b = -Apk * T * kv; const c = Apk * x;
+                    const discriminant = b * b - 4 * kx * c;
+                    if (discriminant < 0) return displayError("Impossible move");
+                    Vmax = (-b - Math.sqrt(discriminant)) / (2 * kx);
+                } else {
+                    profileTypeStr = "Triangle"; Vmax = Vmax_triangle;
+                }
+                t_a = Vmax > 0 ? Vmax / (kv * Apk) : 0; t_c = T - 2 * t_a;
+                updateOutput('Vmax1', Vmax); updateOutput('t_a1', t_a); updateOutput('t_c1', t_c < 0 ? 0 : t_c); updateOutput('t_d1', t_a); updateOutput('profileType1', profileTypeStr);
+                return { T, t_a, t_c, Vmax, Apk, profileType };
+            },
+            2: () => {
+                const { x, Vmax, Apk, profileType } = getInputs(2);
+                const { kv, kx } = getProfileFactors(profileType);
+                const x_crit = 2 * (kx / (kv * kv)) * Vmax * Vmax / Apk;
+                let T, t_a, t_c, V_peak, profileTypeStr;
+                if (x >= x_crit) {
+                    profileTypeStr = 'Trapezoid'; V_peak = Vmax;
+                    t_a = Vmax / (kv * Apk); t_c = (x - x_crit) / Vmax; T = 2 * t_a + t_c;
+                } else {
+                    profileTypeStr = 'Triangle'; t_c = 0;
+                    V_peak = Math.sqrt(x * Apk * kv * kv / (2 * kx));
+                    t_a = V_peak / (kv * Apk); T = 2 * t_a;
+                }
+                updateOutput('T2', T); updateOutput('t_a2', t_a); updateOutput('t_c2', t_c); updateOutput('t_d2', t_a); updateOutput('profileType2', profileTypeStr);
+                return { T, t_a, t_c, Vmax: V_peak, Apk, profileType };
+            },
+            3: () => {
+                const { x, Vmax, T, profileType } = getInputs(3);
+                const { kv, kx } = getProfileFactors(profileType);
+                const min_time_for_trap = (2 * kx / (kv * kv)) * (x / Vmax);
+                let Apk, t_a, t_c, V_peak, profileTypeStr;
+                if (T > min_time_for_trap) {
+                    profileTypeStr = 'Trapezoid'; V_peak = Vmax;
+                    Apk = (Vmax * Vmax * (2 * kx / (kv * kv))) / (Vmax * T - x);
+                    t_a = Vmax / (kv * Apk); t_c = T - 2 * t_a;
+                } else {
+                    profileTypeStr = 'Triangle'; t_c = 0; t_a = T / 2;
+                    Apk = x / (2 * kx * t_a * t_a); V_peak = kv * Apk * t_a;
+                }
+                updateOutput('Apk3', Apk); updateOutput('t_a3', t_a); updateOutput('t_c3', t_c); updateOutput('t_d3', t_a); updateOutput('profileType3', profileTypeStr);
+                return { T, t_a, t_c, Vmax: V_peak, Apk, profileType };
+            },
+            4: () => {
+                const { Vmax, Apk, T, profileType } = getInputs(4);
+                const { kv, kx } = getProfileFactors(profileType);
+                const t_a_for_vmax = Vmax / (kv * Apk);
+                let x, t_a, t_c, V_peak, profileTypeStr;
+                if (T >= 2 * t_a_for_vmax) {
+                    profileTypeStr = 'Trapezoid'; V_peak = Vmax; t_a = t_a_for_vmax; t_c = T - 2 * t_a;
+                    x = (2 * kx * Apk * t_a * t_a) + (Vmax * t_c);
+                } else {
+                    profileTypeStr = 'Triangle'; t_c = 0; t_a = T / 2;
+                    V_peak = kv * Apk * t_a; x = 2 * kx * Apk * t_a * t_a;
+                }
+                updateOutput('x4', x); updateOutput('t_a4', t_a); updateOutput('t_c4', t_c); updateOutput('t_d4', t_a); updateOutput('profileType4', profileTypeStr);
+                return { T, t_a, t_c, Vmax: V_peak, Apk, profileType };
+            },
+            5: (p = getInputs(5)) => {
+                const { kv, kx } = getProfileFactors(p.profileType);
+                const Apk = (kx / (kv * kv)) * p.Vmax * p.Vmax / p.xa;
+                const result = CALCULATORS[2]({ ...p, Apk }); // Re-use calculator 2's logic
+                if (result) {
+                    updateOutput('Apk5', Apk); updateOutput('T5', result.T); updateOutput('t_a5', result.t_a); updateOutput('t_c5', result.t_c); updateOutput('t_d5', result.t_a); updateOutput('profileType5', result.profileTypeStr);
+                }
+                return { ...result, Apk };
+            },
+            6: (p = getInputs(6)) => {
+                const { kv, kx } = getProfileFactors(p.profileType);
+                const Apk = (kx / (kv * kv)) * p.Vmax * p.Vmax / p.xa;
+                const result = CALCULATORS[4]({ ...p, Apk }); // Re-use calculator 4's logic
+                if (result) {
+                    updateOutput('Apk6', Apk); updateOutput('x6', result.x); updateOutput('t_a6', result.t_a); updateOutput('t_c6', result.t_c); updateOutput('t_d6', result.t_a); updateOutput('profileType6', result.profileTypeStr);
+                }
+                return { ...result, Apk };
+            },
+            7: (p = getInputs(7)) => {
+                const { kv, kx } = getProfileFactors(p.profileType);
+                const t_a = p.Vscan / (kv * p.Apk);
+                const x_a = kx * p.Apk * t_a * t_a;
+                const t_c = p.xs / p.Vscan; const T = 2 * t_a + t_c; const x = 2 * x_a + p.xs;
+                updateOutput('T7', T); updateOutput('x7', x); updateOutput('t_a7', t_a); updateOutput('t_c7', t_c); updateOutput('t_d7', t_a);
+                return { T, t_a, t_c, Vmax: p.Vscan, Apk: p.Apk, profileType: p.profileType };
+            },
+            8: (p = getInputs(8)) => {
+                if (p.x < p.xs) return displayError('Total distance cannot be less than scan distance.');
+                const { kv, kx } = getProfileFactors(p.profileType);
+                const x_a = (p.x - p.xs) / 2;
+                const t_a = x_a * kv / (kx * p.Vscan);
+                const Apk = p.Vscan / (kv * t_a);
+                const t_c = p.xs / p.Vscan; const T = 2 * t_a + t_c;
+                updateOutput('Apk8', Apk); updateOutput('T8', T); updateOutput('t_a8', t_a); updateOutput('t_c8', t_c); updateOutput('t_d8', t_a);
+                return { T, t_a, t_c, Vmax: p.Vscan, Apk, profileType: p.profileType };
+            },
+            9: (p = getInputs(9)) => {
+                const t_c = p.xs / p.Vscan;
+                if (p.T < t_c) return displayError('Total time cannot be less than scan time.');
+                const { kv, kx } = getProfileFactors(p.profileType);
+                const t_a = (p.T - t_c) / 2;
+                const Apk = p.Vscan / (kv * t_a);
+                const x_a = kx * Apk * t_a * t_a;
+                const x = 2 * x_a + p.xs;
+                updateOutput('Apk9', Apk); updateOutput('x9', x); updateOutput('t_a9', t_a); updateOutput('t_c9', t_c); updateOutput('t_d9', t_a);
+                return { T: p.T, t_a, t_c, Vmax: p.Vscan, Apk, profileType: p.profileType };
+            }
+        };
+
+        function calculateAndDraw(tabNum) {
+            clearError(); clearCharts(tabNum);
+            const calculator = CALCULATORS[tabNum];
+            if (calculator) {
+                const profile = calculator();
+                if (profile) {
+                    const { T, t_a, t_c, Vmax, Apk, profileType } = profile;
+                    if ([T, t_a, t_c, Vmax, Apk].some(isNaN) || !isFinite(T)) {
+                        displayError('Calculation resulted in invalid or infinite numbers.'); return;
+                    }
+                    generateAndDrawProfile(tabNum, T, t_a, t_c, Vmax, Apk, profileType);
+                }
+            }
+        }
+        
+        function generateAndDrawProfile(tabNum, T, t_a, t_c, v_max, a_pk, profileType) {
+            const timePoints = [], posPoints = [], velPoints = [], accelPoints = [];
+            const numSteps = 200; const dt = T > 0 ? T / numSteps : 0; const t_c_end = t_a + t_c;
+            let p = 0, v = 0;
+            for (let i = 0; i <= numSteps; i++) {
+                const t = i * dt; timePoints.push(t.toFixed(3));
+                let currentAccel;
+                const t_phase = t <= t_a ? t : (t > t_c_end ? t - t_c_end : 0);
+                const decel_t_a = T - t_c_end;
+                if (t <= t_a) {
+                    switch (profileType) {
+                        case 'sinusoidal': currentAccel = a_pk * Math.sin(Math.PI * t / t_a); break;
+                        case 'linear': currentAccel = t < t_a / 2 ? (2 * a_pk * t / t_a) : (2 * a_pk * (1 - t / t_a)); break;
+                        default: currentAccel = a_pk;
+                    }
+                } else if (t <= t_c_end) { currentAccel = 0;
+                } else {
+                     switch (profileType) {
+                        case 'sinusoidal': currentAccel = -a_pk * Math.sin(Math.PI * t_phase / decel_t_a); break;
+                        case 'linear': currentAccel = t_phase < decel_t_a / 2 ? (-2 * a_pk * t_phase / decel_t_a) : (-2 * a_pk * (1 - t_phase / decel_t_a)); break;
+                        default: currentAccel = -a_pk;
+                    }
+                }
+                v += currentAccel * dt; p += v * dt;
+                accelPoints.push(currentAccel); velPoints.push(v); posPoints.push(p);
+            }
+            if (velPoints.length > 0) velPoints[velPoints.length - 1] = 0;
+             if (posPoints.length > 0) {
+                const calculated_x = posPoints[posPoints.length - 1];
+                let target_x;
+                const x_input = TABS_CONFIG[tabNum-1].inputs.find(inp => inp.id === 'x');
+                if (x_input) target_x = getVal(`x${tabNum}`);
+                if(target_x && calculated_x > 0){
+                    const scale_factor = target_x / calculated_x;
+                    if(Math.abs(1 - scale_factor) < 0.2) { 
+                        for(let i=0; i<posPoints.length; i++) posPoints[i] *= scale_factor;
+                    }
+                }
+            }
+            createOrUpdateChart(`posChart${tabNum}`, timePoints, posPoints, 'Position', '#0ea5e9');
+            createOrUpdateChart(`velChart${tabNum}`, timePoints, velPoints, 'Velocity', '#22c55e');
+            createOrUpdateChart(`accelChart${tabNum}`, timePoints, accelPoints, 'Acceleration', '#f97316');
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            generateUI();
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active', 'text-white'));
+                    tab.classList.add('active', 'text-white');
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    const activeTabId = tab.dataset.tab;
+                    document.getElementById(activeTabId).classList.remove('hidden');
+                    calculateAndDraw(parseInt(activeTabId.replace('tab','')));
+                });
+            });
+            for (let i = 1; i <= TABS_CONFIG.length; i++) {
+                document.getElementById(`calc-form-${i}`).addEventListener('input', () => calculateAndDraw(i));
+            }
+            calculateAndDraw(1); // Initial calculation
+        });
+    </script>
+</body>
+</html>
