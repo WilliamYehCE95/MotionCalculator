@@ -67,7 +67,7 @@
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-white">Motion Profile Calculator V.001 </h1>
+            <h1 class="text-4xl font-bold text-white">Advanced Motion Profile Calculator</h1>
             <p class="text-lg text-gray-400 mt-2">Select a calculation mode and profile type to analyze and visualize motion.</p>
         </header>
 
@@ -97,18 +97,18 @@
     <script>
         // --- DATA ---
         const TABS_CONFIG = [
-            { id: 1, title: 'x, T, Aₚₖ → V', inputs: [ { id: 'x', label: 'Distance (x)', val: 100 }, { id: 'T', label: 'Time (T)', val: 5 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 8 } ], outputs: ['Vmax', 't_a', 't_c', 't_d', 'profileType'] },
-            { id: 2, title: 'x, Vₘₐₓ, Aₚₖ → T', inputs: [ { id: 'x', label: 'Distance (x)', val: 100 }, { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 10 } ], outputs: ['T', 't_a', 't_c', 't_d', 'profileType'] },
-            { id: 3, title: 'x, Vₘₐₓ, T → A', inputs: [ { id: 'x', label: 'Distance (x)', val: 100 }, { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'T', label: 'Time (T)', val: 5 } ], outputs: ['Apk', 't_a', 't_c', 't_d', 'profileType'] },
-            { id: 4, title: 'Vₘₐₓ, Aₚₖ, T → x', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 10 }, { id: 'T', label: 'Time (T)', val: 5 } ], outputs: ['x', 't_a', 't_c', 't_d', 'profileType'] },
-            { id: 5, title: 'Vₘₐₓ, xₐ, x → A, T', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'xa', label: 'Accel Distance (xₐ)', val: 45 }, { id: 'x', label: 'Total Distance (x)', val: 120 } ], outputs: ['Apk', 'T', 't_a', 't_c', 't_d', 'profileType'] },
-            { id: 6, title: 'Vₘₐₓ, xₐ, T → A, x', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ)', val: 30 }, { id: 'xa', label: 'Accel Distance (xₐ)', val: 45 }, { id: 'T', label: 'Time (T)', val: 5 } ], outputs: ['Apk', 'x', 't_a', 't_c', 't_d', 'profileType'] },
-            { id: 7, title: 'Scan: V, xₛ, A → T, x', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ)', val: 50 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ)', val: 10 } ], outputs: ['T', 'x', 't_a', 't_c', 't_d'] },
-            { id: 8, title: 'Scan: V, xₛ, x → A, T', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ)', val: 50 }, { id: 'x', label: 'Total Distance (x)', val: 130 } ], outputs: ['Apk', 'T', 't_a', 't_c', 't_d'] },
-            { id: 9, title: 'Scan: V, xₛ, T → A, x', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ)', val: 50 }, { id: 'T', label: 'Time (T)', val: 6.5 } ], outputs: ['Apk', 'x', 't_a', 't_c', 't_d'] },
+            { id: 1, title: 'x, T, Aₚₖ → V', inputs: [ { id: 'x', label: 'Distance (x) (mm)', val: 100 }, { id: 'T', label: 'Time (T) (s)', val: 5 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ) (mm/s²)', val: 8 } ], outputs: ['Vmax', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 2, title: 'x, Vₘₐₓ, Aₚₖ → T', inputs: [ { id: 'x', label: 'Distance (x) (mm)', val: 100 }, { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ) (mm/s)', val: 30 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ) (mm/s²)', val: 10 } ], outputs: ['T', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 3, title: 'x, Vₘₐₓ, T → A', inputs: [ { id: 'x', label: 'Distance (x) (mm)', val: 100 }, { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ) (mm/s)', val: 30 }, { id: 'T', label: 'Time (T) (s)', val: 5 } ], outputs: ['Apk', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 4, title: 'Vₘₐₓ, Aₚₖ, T → x', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ) (mm/s)', val: 30 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ) (mm/s²)', val: 10 }, { id: 'T', label: 'Time (T) (s)', val: 5 } ], outputs: ['x', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 5, title: 'Vₘₐₓ, xₐ, x → A, T', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ) (mm/s)', val: 30 }, { id: 'xa', label: 'Accel Distance (xₐ) (mm)', val: 45 }, { id: 'x', label: 'Total Distance (x) (mm)', val: 120 } ], outputs: ['Apk', 'T', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 6, title: 'Vₘₐₓ, xₐ, T → A, x', inputs: [ { id: 'Vmax', label: 'Max Velocity (Vₘₐₓ) (mm/s)', val: 30 }, { id: 'xa', label: 'Accel Distance (xₐ) (mm)', val: 45 }, { id: 'T', label: 'Time (T) (s)', val: 5 } ], outputs: ['Apk', 'x', 't_a', 't_c', 't_d', 'profileType'] },
+            { id: 7, title: 'Scan: V, xₛ, A → T, x', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ) (mm/s)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ) (mm)', val: 50 }, { id: 'Apk', label: 'Peak Accel (Aₚₖ) (mm/s²)', val: 10 } ], outputs: ['T', 'x', 't_a', 't_c', 't_d'] },
+            { id: 8, title: 'Scan: V, xₛ, x → A, T', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ) (mm/s)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ) (mm)', val: 50 }, { id: 'x', label: 'Total Distance (x) (mm)', val: 130 } ], outputs: ['Apk', 'T', 't_a', 't_c', 't_d'] },
+            { id: 9, title: 'Scan: V, xₛ, T → A, x', inputs: [ { id: 'Vscan', label: 'Scan Velocity (Vₛ) (mm/s)', val: 20 }, { id: 'xs', label: 'Scan Distance (xₛ) (mm)', val: 50 }, { id: 'T', label: 'Time (T) (s)', val: 6.5 } ], outputs: ['Apk', 'x', 't_a', 't_c', 't_d'] },
         ];
         
-        const OUTPUT_LABELS = { Vmax: 'Max Velocity (Vₘₐₓ)', Apk: 'Peak Accel (Aₚₖ)', T: 'Total Time (T)', x: 'Total Distance (x)', t_a: 'Accel Time (tₐ)', t_c: 'Traverse Time (tₑ)', t_d: 'Decel Time (tₔ)', profileType: 'Profile Type' };
+        const OUTPUT_LABELS = { Vmax: 'Max Velocity (Vₘₐₓ) (mm/s)', Apk: 'Peak Accel (Aₚₖ) (mm/s²)', T: 'Total Time (T) (s)', x: 'Total Distance (x) (mm)', t_a: 'Accel Time (tₐ) (s)', t_c: 'Traverse Time (tₑ) (s)', t_d: 'Decel Time (tₔ) (s)', profileType: 'Profile Type' };
 
         // --- UI GENERATION ---
         function generateUI() {
@@ -263,7 +263,7 @@
             5: (p = getInputs(5)) => {
                 const { kv, kx } = getProfileFactors(p.profileType);
                 const Apk = (kx / (kv * kv)) * p.Vmax * p.Vmax / p.xa;
-                const result = CALCULATORS[2]({ ...p, Apk }); // Re-use calculator 2's logic
+                const result = CALCULATORS[2]({ ...p, Apk });
                 if (result) {
                     updateOutput('Apk5', Apk); updateOutput('T5', result.T); updateOutput('t_a5', result.t_a); updateOutput('t_c5', result.t_c); updateOutput('t_d5', result.t_a); updateOutput('profileType5', result.profileTypeStr);
                 }
@@ -272,7 +272,7 @@
             6: (p = getInputs(6)) => {
                 const { kv, kx } = getProfileFactors(p.profileType);
                 const Apk = (kx / (kv * kv)) * p.Vmax * p.Vmax / p.xa;
-                const result = CALCULATORS[4]({ ...p, Apk }); // Re-use calculator 4's logic
+                const result = CALCULATORS[4]({ ...p, Apk });
                 if (result) {
                     updateOutput('Apk6', Apk); updateOutput('x6', result.x); updateOutput('t_a6', result.t_a); updateOutput('t_c6', result.t_c); updateOutput('t_d6', result.t_a); updateOutput('profileType6', result.profileTypeStr);
                 }
@@ -363,9 +363,9 @@
                     }
                 }
             }
-            createOrUpdateChart(`posChart${tabNum}`, timePoints, posPoints, 'Position', '#0ea5e9');
-            createOrUpdateChart(`velChart${tabNum}`, timePoints, velPoints, 'Velocity', '#22c55e');
-            createOrUpdateChart(`accelChart${tabNum}`, timePoints, accelPoints, 'Acceleration', '#f97316');
+            createOrUpdateChart(`posChart${tabNum}`, timePoints, posPoints, 'Position (mm)', '#0ea5e9');
+            createOrUpdateChart(`velChart${tabNum}`, timePoints, velPoints, 'Velocity (mm/s)', '#22c55e');
+            createOrUpdateChart(`accelChart${tabNum}`, timePoints, accelPoints, 'Acceleration (mm/s²)', '#f97316');
         }
 
         // --- INITIALIZATION ---
